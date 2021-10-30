@@ -12,6 +12,7 @@ class DecisionTreeClassifier:
     def _build_tree(self, X, y, current_depth=0):
 
         node = Node(self._compute_gini_index(y), y)
+        print(current_depth)
 
         # Check if exceeds depth
         if current_depth < self.max_depth:
@@ -23,6 +24,8 @@ class DecisionTreeClassifier:
                 left_indices = X[:, best_split["idx"]] <= best_split["thres"]
                 X_left, y_left = X[left_indices], y[left_indices]
                 X_right, y_right = X[~left_indices], y[~left_indices]
+
+                # Building a node with max leaf nodes = 2
                 node.set_split_values(
                     best_split["idx"],
                     best_split["thres"],
@@ -33,12 +36,11 @@ class DecisionTreeClassifier:
         return node
 
     def _get_split(self, X, y):
-        # TODO: Stopping condition of min samples
 
-        # Calculate Gini
+        # Get number of samples and features in current split
         num_samples, num_features = X.shape
 
-        # Calculates the gini index for current node
+        # Calculates the gini index for current split
         best_gini = self._compute_gini_index(y)
         best_dict = {"idx": None, "thres": None}
 
@@ -65,12 +67,15 @@ class DecisionTreeClassifier:
                         best_dict["idx"] = idx
                         best_dict["thres"] = thres
 
+        # Return best split
         return best_dict
 
     def _compute_gini_split(self, num_samples, y_left, y_right):
+        # Get weights for left and right split
         weight_left = len(y_left) / num_samples
         weight_right = len(y_right) / num_samples
 
+        # Calculate gain based on split
         gain = weight_left * self._compute_gini_index(
             y_left
         ) + weight_right * self._compute_gini_index(y_right)
@@ -86,11 +91,21 @@ class DecisionTreeClassifier:
 
     def fit(self, X, y):
         # Build tree
-        self.root = self._build_tree(X.to_numpy(), y.to_numpy())
+        X, y = np.array(X), np.array(y)
+        self.root = self._build_tree(X, y)
         self.print_tree(self.root)
 
-    def predict(self):
-        pass
+    def predict(self, X):
+        return [self._predict(X_) for X_ in np.array(X)]
+
+    def _predict(self, X_):
+        node = self.root
+        while hasattr(node, "left"):
+            if X_[node.feature] < node.threshold:
+                node = node.left
+            else:
+                node = node.right
+        return node.prediction
 
     def print_tree(self, node):
         print(node)
@@ -106,5 +121,16 @@ if __name__ == "__main__":
     y = df.loc[:, "fire"]
     y = y.apply(lambda x: x.strip())
 
+    from sklearn.model_selection import train_test_split
+    from sklearn.metrics import accuracy_score
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, random_state=0, test_size=int(len(X) / 3)
+    )
+
     dt = DecisionTreeClassifier()
-    dt.fit(X, y)
+    dt.fit(X_train, y_train)
+    preds = dt.predict(X_test)
+    preds = ["yes" if p == 1 else "no" for p in preds]
+    print(preds)
+    print(accuracy_score(y_test, preds))

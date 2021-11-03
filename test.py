@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tree import DecisionTreeClassifier as DTC
 from sklearn.tree import DecisionTreeClassifier as SKDTC
+from sklearn.ensemble import AdaBoostClassifier
 from sklearn.tree import plot_tree
 
 
@@ -11,27 +12,36 @@ from sklearn.metrics import accuracy_score
 from sklearn.utils.class_weight import compute_sample_weight
 
 
-def train_scratch(X_train, y_train, X_test, y_test, sample_weights=None):
+def train_scratch_dt(X_train, y_train, X_test, y_test, sample_weights=None):
     dt = DTC()
     dt.fit(X_train, y_train, sample_weights)
     preds = dt.predict(X_test)
     print(accuracy_score(y_test, preds))
 
 
-def train_sklearn(X_train, y_train, X_test, y_test, sample_weights=None):
+def train_sklearn_dt(X_train, y_train, X_test, y_test, sample_weights=None, viz=False):
     dt = SKDTC(max_depth=1, max_leaf_nodes=2)
     dt.fit(X_train, y_train, sample_weight=sample_weights)
     preds = dt.predict(X_test)
     print(accuracy_score(y_test, preds))
-    fig = plt.figure(figsize=(10, 5))
-    _ = plot_tree(
-        dt,
-        feature_names=X_train.columns,
-        class_names=["no", "yes"],
-        filled=True,
-        fontsize=10,
-    )
-    plt.show()
+    if viz:
+        fig = plt.figure(figsize=(10, 5))
+        _ = plot_tree(
+            dt,
+            feature_names=X_train.columns,
+            class_names=["no", "yes"],
+            filled=True,
+            fontsize=10,
+        )
+        plt.show()
+
+
+def train_sklearn_ada(X_train, y_train, X_test, y_test, sample_weights=None):
+    ada = AdaBoostClassifier(n_estimators=50, algorithm="SAMME", learning_rate=1.0)
+    ada.fit(X_train, y_train, sample_weights)
+    preds = ada.predict(X_test)
+    print(accuracy_score(y_test, preds))
+    print(ada.n_classes_)
 
 
 if __name__ == "__main__":
@@ -61,6 +71,7 @@ if __name__ == "__main__":
     #     )
     # )
 
-    train_scratch(X_train, y_train, X_test, y_test, sample_weights)
-    train_sklearn(X_train, y_train, X_test, y_test, sample_weights)
+    train_scratch_dt(X_train, y_train, X_test, y_test, sample_weights)
+    train_sklearn_dt(X_train, y_train, X_test, y_test, sample_weights)
+    train_sklearn_ada(X_train, y_train, X_test, y_test)
     # train_sklearn(X_train, y_train, X_test, y_test)

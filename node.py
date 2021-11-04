@@ -2,11 +2,11 @@ import numpy as np
 
 
 class Node:
-    def __init__(self, gini, value, y):
+    def __init__(self, gini, value, num_samples, prediction):
         self.gini = gini
-        self.num_samples = len(y)
+        self.num_samples = num_samples
         self.value = value
-        self.prediction = y[np.argmax(self.value)]
+        self.prediction = prediction
 
     def __str__(self):
         text = ""

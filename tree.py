@@ -12,11 +12,14 @@ class DecisionTreeClassifier:
     def _build_tree(self, X, y, sample_weight=None, current_depth=0):
 
         if sample_weight is not None:
-            value = [sample_weight[y == c].sum() for c in self.classes]
+            value = [sample_weight[y == c].sum() for c in self.classes_]
         else:
-            value = [np.count_nonzero(y == c) for c in self.classes]
+            value = [np.count_nonzero(y == c) for c in self.classes_]
+        prediction = self.classes_[np.argmax(value)]
 
-        node = Node(self._compute_gini_index(y, sample_weight), value, y)
+        node = Node(
+            self._compute_gini_index(y, sample_weight), value, len(y), prediction
+        )
 
         # Check if exceeds depth
         if current_depth < self.max_depth:
@@ -25,7 +28,7 @@ class DecisionTreeClassifier:
             if best_split["idx"] is not None:
 
                 # Use best split to split data for recursive call
-                left_indices = X[:, best_split["idx"]] <= best_split["thres"]
+                left_indices = X[:, best_split["idx"]] < best_split["thres"]
                 X_left, y_left = X[left_indices], y[left_indices]
                 X_right, y_right = X[~left_indices], y[~left_indices]
 
@@ -63,6 +66,7 @@ class DecisionTreeClassifier:
         for idx in range(num_features):
             feature_values = X[:, idx]
             thresholds = np.unique(feature_values)
+            thresholds = (thresholds[:-1] + thresholds[1:]) / 2
 
             # Check threshold values to find split
             for thres in thresholds:
@@ -99,9 +103,17 @@ class DecisionTreeClassifier:
     def _compute_gini_split(
         self, num_samples, y_left, y_right, sample_weight_left, sample_weight_right
     ):
+
         # Get weights for left and right split
-        weight_left = len(y_left) / num_samples
-        weight_right = len(y_right) / num_samples
+        if sample_weight_left is not None and sample_weight_right is not None:
+            # If using sample weight, get split weights based on it
+            total_weight = sample_weight_left.sum() + sample_weight_right.sum()
+            weight_left = sample_weight_left.sum() / total_weight
+            weight_right = sample_weight_right.sum() / total_weight
+        else:
+            # Else get split weights based on count
+            weight_left = len(y_left) / num_samples
+            weight_right = len(y_right) / num_samples
 
         # Calculate gain based on split
         gain = weight_left * self._compute_gini_index(
@@ -127,9 +139,9 @@ class DecisionTreeClassifier:
     def fit(self, X, y, sample_weight=None):
         # Build tree
         X, y = np.array(X), np.array(y)
-        self.classes = np.unique(y)
+        y[y < 1] = -1
+        self.classes_ = np.unique(y)
         self.root = self._build_tree(X, y, sample_weight)
-        self.print_tree(self.root)
 
     def predict(self, X):
         return [self._predict(X_) for X_ in np.array(X)]

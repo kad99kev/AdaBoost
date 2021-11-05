@@ -2,20 +2,22 @@ import numpy as np
 import pandas as pd
 
 from node import Node
+from graph_utils import plot_graph
 
 
 class DecisionTreeClassifier:
     def __init__(self, max_depth=1):
         self.max_depth = max_depth
         self.root = None
+        self.nodes = []
 
     def _build_tree(self, X, y, sample_weight=None, current_depth=0):
 
         if sample_weight is not None:
-            value = [sample_weight[y == c].sum() for c in self.classes_]
+            value = [sample_weight[y == c].sum() for c in self.classes]
         else:
-            value = [np.count_nonzero(y == c) for c in self.classes_]
-        prediction = self.classes_[np.argmax(value)]
+            value = [np.count_nonzero(y == c) for c in self.classes]
+        prediction = self.classes[np.argmax(value)]
 
         node = Node(
             self._compute_gini_index(y, sample_weight), value, len(y), prediction
@@ -49,6 +51,12 @@ class DecisionTreeClassifier:
                     self._build_tree(
                         X_right, y_right, sample_weight_right, current_depth + 1
                     ),
+                )
+                self.nodes.extend(
+                    [
+                        (str(node), str(node.right)),
+                        (str(node), str(node.left)),
+                    ]
                 )
 
         return node
@@ -139,8 +147,7 @@ class DecisionTreeClassifier:
     def fit(self, X, y, sample_weight=None):
         # Build tree
         X, y = np.array(X), np.array(y)
-        y[y < 1] = -1
-        self.classes_ = np.unique(y)
+        self.classes = np.unique(y)
         self.root = self._build_tree(X, y, sample_weight)
 
     def predict(self, X):
@@ -155,9 +162,6 @@ class DecisionTreeClassifier:
                 node = node.right
         return node.prediction
 
-    def print_tree(self, node):
-        print(node)
-        if not hasattr(node, "left") and not hasattr(node, "right"):
-            return
-        self.print_tree(node.left)
-        self.print_tree(node.right)
+    def plot_tree(self):
+        # Reverse and return so that the left most node is towards the start of the list
+        plot_graph(self.nodes[::-1], str(self.root))

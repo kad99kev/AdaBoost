@@ -47,16 +47,21 @@ def plot_roc_curve(y_test, pred):
     plt.title('ROC curve')
     plt.show()
 
+MAX_DEPTH = 4
+
+
 def train_scratch_dt(X_train, y_train, X_test, y_test, sample_weights=None):
-    dt = DTC()
+    dt = DTC(max_depth=MAX_DEPTH)
     dt.fit(X_train, y_train, sample_weights)
     preds = dt.predict(X_test)
+    dt.plot_tree()
     return accuracy_score(y_test, preds)
 
 
 def train_sklearn_dt(X_train, y_train, X_test, y_test, sample_weights=None, viz=False):
-    dt = SKDTC(max_depth=1, max_leaf_nodes=2)
+    dt = SKDTC(max_depth=MAX_DEPTH)
     dt.fit(X_train, y_train, sample_weight=sample_weights)
+    print(dt)
     preds = dt.predict(X_test)
     if viz:
         plot_tree_test(dt, X)
@@ -89,7 +94,7 @@ if __name__ == "__main__":
     y = y.apply(lambda x: x.strip())
 
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, random_state=0, test_size=int(len(X) / 3)
+        X, y, random_state=1, test_size=int(len(X) / 3)
     )
 
     y_train = np.array([1 if v == "yes" else -1 for v in y_train])
@@ -100,9 +105,8 @@ if __name__ == "__main__":
     # print(sample_weights)
     sample_weights = compute_sample_weight("balanced", y_train)
 
-    assert train_scratch_dt(X_train, y_train, X_test, y_test) == train_sklearn_dt(
-        X_train, y_train, X_test, y_test
-    )
+    print(train_scratch_dt(X_train, y_train, X_test, y_test))
+    print(train_sklearn_dt(X_train, y_train, X_test, y_test, viz=True))
     assert train_sklearn_ada(X_train, y_train, X_test, y_test) == train_scratch_ada(
         X_train, y_train, X_test, y_test
     )

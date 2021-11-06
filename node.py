@@ -11,9 +11,9 @@ class Node:
     def __str__(self):
         text = ""
         if hasattr(self, "left") and hasattr(self, "right"):
-            text += f"{self.feature} <= {self.threshold}\n"
+            text += f"{self.feature} <= {self.threshold:.3f}\n"
 
-        text += f"Gini: {self.gini}\n"
+        text += f"Gini: {self.gini:.3f}\n"
         text += f"Samples: {self.num_samples}\n"
         text += f"Value: {self.value}\n"
         text += f"Class: {self.prediction}\n"

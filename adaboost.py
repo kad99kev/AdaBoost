@@ -45,11 +45,7 @@ class AdaBoost:
 
         # Initally, initalize observation weights wi = 1 / len(N)
         N = len(y)
-        sample_weights = (
-            np.array([1 / N for i in range(N)])
-            if sample_weight is None
-            else sample_weight
-        )
+        sample_weights = np.ones(N) / N if sample_weight is None else sample_weight
         self.classes = np.unique(y)
 
         # for i in the range of n_estimators
@@ -91,7 +87,7 @@ class AdaBoost:
         pred = 0
         for (clf, a) in zip(self.models, self.alphas):
             # Gives us output of shape (n_classes, 1)
-            self.classes = clf.classes_[:, np.newaxis]
+            self.classes = clf.classes[:, np.newaxis]
             # Initial shape, (2, *)
             # Transposing gives us a shape of (*, 2)
             pred += (clf.predict(X) == np.array(self.classes)).T * a

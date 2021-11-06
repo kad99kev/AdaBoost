@@ -2,29 +2,29 @@ import pandas as pd
 import numpy as np
 
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
-from sklearn.ensemble import AdaBoostClassifier as SklearnAdaBoost
+from sklearn.metrics import roc_curve, auc, accuracy_score
+from sklearn.tree import DecisionTreeClassifier as SklearnDecisionTree
 
-from adaboost import AdaBoostClassifier
+from adaboost.tree import DecisionTreeClassifier
 
 from .plot_tests import plot_history
 
 
-def train_sklearn(X_train, y_train, X_test, y_test, sample_weights=None):
-    ada = SklearnAdaBoost(n_estimators=50, algorithm="SAMME")
-    ada.fit(X_train, y_train, sample_weights)
-    preds = ada.predict(X_test)
+def train_scratch_dt(X_train, y_train, X_test, y_test, sample_weights=None):
+    dt = DecisionTreeClassifier(max_depth=1)
+    dt.fit(X_train, y_train, sample_weights)
+    preds = dt.predict(X_test)
     return accuracy_score(y_test, preds)
 
 
-def train_scratch(X_train, y_train, X_test, y_test, sample_weights=None):
-    ada = AdaBoostClassifier()
-    ada.fit(X_train, y_train, sample_weights)
-    preds = ada.predict(X_test)
+def train_sklearn_dt(X_train, y_train, X_test, y_test, sample_weights=None):
+    dt = SklearnDecisionTree(max_depth=1)
+    dt.fit(X_train, y_train, sample_weight=sample_weights)
+    preds = dt.predict(X_test)
     return accuracy_score(y_test, preds)
 
 
-def test_adaboost():
+def test_decisiontree():
     df = pd.read_csv("wildfires.txt", sep="\t", header=0)
     X = df.drop(columns=["fire"])
     y = df.loc[:, "fire"]
@@ -39,8 +39,8 @@ def test_adaboost():
         y_train = np.array([1 if v == "yes" else -1 for v in y_train])
         y_test = np.array([1 if v == "yes" else -1 for v in y_test])
 
-        sklearn_acc = train_sklearn(X_train, y_train, X_test, y_test)
-        scratch_acc = train_scratch(X_train, y_train, X_test, y_test)
+        sklearn_acc = train_sklearn_dt(X_train, y_train, X_test, y_test)
+        scratch_acc = train_scratch_dt(X_train, y_train, X_test, y_test)
         history.append((sklearn_acc, scratch_acc))
 
     history = np.round(history, 4)
@@ -54,8 +54,8 @@ def test_adaboost():
     )
     data = pd.DataFrame(data, columns=["Sklearn", "Scratch"])
     data.insert(0, "Run", [i + 1 if i < 10 else "<b>Mean</b>" for i in range(11)])
-    plot_history(data, "adaboost")
+    plot_history(data, "decision-tree")
 
 
 if __name__ == "__main__":
-    test_adaboost()
+    test_decisiontree()

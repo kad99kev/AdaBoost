@@ -2,7 +2,7 @@
 Written by:
 Name: Elita Menezes
 Student ID:
-Class: 
+Class: MSc DA
 """
 
 import numpy as np

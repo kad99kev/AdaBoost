@@ -1,3 +1,10 @@
+"""
+Written by:
+Name: Kevlyn Kadamala
+Student ID: 21236191
+Class: MSc AI
+"""
+
 import re
 import plotly.graph_objects as go
 from igraph import Graph

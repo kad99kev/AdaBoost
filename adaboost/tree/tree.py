@@ -1,5 +1,11 @@
-import numpy as np
+"""
+Written by:
+Name: Kevlyn Kadamala
+Student ID: 21236191
+Class: MSc AI
+"""
 
+import numpy as np
 from .node import Node
 from .tree_viz import plot_tree
 

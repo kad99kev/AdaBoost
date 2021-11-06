@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-from sklearn.tree import plot_tree
+from adaboost import AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier as SKDTC
 from sklearn.ensemble import AdaBoostClassifier
 
@@ -81,9 +81,11 @@ def train_sklearn_ada(X_train, y_train, X_test, y_test, sample_weights=None):
 
 
 def train_scratch_ada(X_train, y_train, X_test, y_test, sample_weights=None):
-    ada = ABC()
+    ada = AdaBoostClassifier()
     ada.fit(X_train, y_train, sample_weights)
     preds = ada.predict(X_test)
+    print(y_test)
+    print(preds)
     plot_roc_curve(y_test, preds)
     return accuracy_score(y_test, preds)
 

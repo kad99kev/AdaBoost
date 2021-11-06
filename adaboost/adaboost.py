@@ -1,8 +1,7 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import plotly.graph_objects as go
-from tree import DecisionTreeClassifier
+from .tree import DecisionTreeClassifier
 
 
 class AdaBoostClassifier:
@@ -11,9 +10,10 @@ class AdaBoostClassifier:
         self.n_estimators = n_estimators
         self.models = [None] * n_estimators  # stores the model after each iteration
         self.alphas = [None] * n_estimators  # stores the weights after each iteration
-        self.training_error = [None] * n_estimators # stores the training error after each iteration
+        self.training_error = [
+            None
+        ] * n_estimators  # stores the training error after each iteration
         self.learning_rate = learning_rate
-        
 
     def check_y(self, y):
         """
@@ -26,15 +26,18 @@ class AdaBoostClassifier:
         """
         Plotting the error rate for each iteration
         """
-    
-        fig = go.Figure(data = go.Scatter(x = [i for i in range(self.n_estimators)], y = self.training_error))
+
+        fig = go.Figure(
+            data=go.Scatter(
+                x=[i for i in range(self.n_estimators)], y=self.training_error
+            )
+        )
         fig.update_layout(
-            title = "Error rates for each iteration", 
-            xaxis_title = "Iteration",
-            yaxis_title = "Error"
+            title="Error rates for each iteration",
+            xaxis_title="Iteration",
+            yaxis_title="Error",
         )
         fig.show()
-
 
     def fit(self, X, y, sample_weight=None):
         """
@@ -98,7 +101,6 @@ class AdaBoostClassifier:
         return self.classes.take(pred > 0, axis=0)
 
 
-
 if __name__ == "__main__":
     df = pd.read_csv("wildfires.txt", sep="\t", header=0)
     X = df.drop(columns=["fire"])
@@ -117,7 +119,7 @@ if __name__ == "__main__":
     clf = AdaBoostClassifier(learning_rate=0.5)
     clf.fit(X_train, y_train)
     pred = clf.predict(X_test)
-    
+
     print(f"Accuracy: ", accuracy_score(y_test, pred))
 
     # clf.plot_error_rates()

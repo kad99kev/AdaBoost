@@ -2,9 +2,6 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc
-from tree import DecisionTreeClassifier as DTC
-
-from adaboost import AdaBoost
 from sklearn.tree import DecisionTreeClassifier as SKDTC
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.tree import plot_tree
@@ -13,6 +10,12 @@ from sklearn.tree import plot_tree
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.utils.class_weight import compute_sample_weight
+
+from adaboost import AdaBoostClassifier
+
+
+def test_basic():
+    assert 1 == 1
 
 
 def plot_tree_test(clf, X):
@@ -25,6 +28,7 @@ def plot_tree_test(clf, X):
         fontsize=10,
     )
     plt.show()
+
 
 def plot_roc_curve(y_test, pred):
     """
@@ -42,10 +46,11 @@ def plot_roc_curve(y_test, pred):
     plt.plot(fpr[1], tpr[1])
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title('ROC curve')
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.title("ROC curve")
     plt.show()
+
 
 MAX_DEPTH = 4
 
@@ -66,7 +71,6 @@ def train_sklearn_dt(X_train, y_train, X_test, y_test, sample_weights=None, viz=
     if viz:
         plot_tree_test(dt, X)
     return accuracy_score(y_test, preds)
-    
 
 
 def train_sklearn_ada(X_train, y_train, X_test, y_test, sample_weights=None):
@@ -83,8 +87,6 @@ def train_scratch_ada(X_train, y_train, X_test, y_test, sample_weights=None):
     preds = ada.predict(X_test)
     plot_roc_curve(y_test, preds)
     return accuracy_score(y_test, preds)
-
-
 
 
 if __name__ == "__main__":
@@ -111,9 +113,4 @@ if __name__ == "__main__":
         X_train, y_train, X_test, y_test
     )
 
-    
     print("All tests passed!!!!")
-
-
-
-

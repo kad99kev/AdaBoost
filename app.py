@@ -10,12 +10,15 @@ from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 
 
-def read_files(filename):
+def read_files(file):
     """
-    Reading files using pandas read_csv
-    Saving the last column as y and the remaining columns as X
+    Reading files using pandas read_csv.
+    Saves the first column as y and the remaining columns as X.
+
+    Arguments:
+        file: Path to the file.
     """
-    df = pd.read_csv(filename, sep="\t", header=0)
+    df = pd.read_csv(file, sep="\t", header=0)
     X = df.iloc[: , 1:]
     y = df.iloc[:, 0]
     y = y.apply(lambda x: x.strip())
@@ -23,8 +26,11 @@ def read_files(filename):
 
 def convert_y(y):
     """
-    Converts y variable to -1 to 1
-    Suitable for binary data only
+    Converts y variable to {-1, 1}.
+    Operation suitable for binary classification only.
+
+    Arguments:
+        y: list of elements having binary class.
     """
     # find unique values
     classes = y.unique()
@@ -36,46 +42,62 @@ def convert_y(y):
 
 def split_data(X, y):
     """
-    Splitting the dataset into train and test
+    Splits the dataset into train and test.
+
+    Arguments:
+        X: Inputs values.
+        y: Tagret values.
     """
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, random_state=1, test_size=int(len(X) / 3)
     )
     return X_train, X_test, y_train, y_test
 
-def plt(y_test, preds, classes):
-    """
-    Getting the accuracy of the data
-    Getting the roc curves
-    Plotting the confusion matrix
-    """
-    st.markdown(f"##### Accuracy: {round(accuracy_score(y_test, preds), 4)}")
-    plt_roc_curve(y_test, preds)
-    plt_confusion_matrix(y_test, preds, classes)
-
 
 if __name__ == '__main__':
     st.title('Adaboost')
 
-    # reading the files
+    # Reads the user input files
     uploaded_file = st.file_uploader("Add a csv or txt file")
     if uploaded_file:
         X, y = read_files(uploaded_file)
         y, classes = convert_y(y)    
 
-        # splitting the data into 2/3 train and 1/3 test
+        # Splits the data into test and train
         X_train, X_test, y_train, y_test = split_data(X, y)
 
-        # Adaboost from scratch
+
+        # Predicts using the model from scratch
         st.subheader('Adaboost from scratch')
         clf_scratch = AdaBoostClassifier(n_estimators = 100, learning_rate=0.05)
         clf_scratch.fit(X_train, y_train)
         pred = clf_scratch.predict(X_test)
-        preds = pd.Series((p[0] for p in pred))
-        plt(y_test, preds, classes)
-        
+        scratch_preds = pd.Series((p[0] for p in pred))
+        st.markdown(f"##### Accuracy: {round(accuracy_score(y_test, scratch_preds), 4)}")
+
+        dc_col11, dc_col12 = st.columns(2)
+
+        with dc_col11:
+            # Plotting the roc curve
+            plt_roc_curve(y_test, scratch_preds)
+            
+        with dc_col12:
+            # Plotting the confusion matrix
+            plt_confusion_matrix(y_test, scratch_preds, classes)
+
+        # Predicts using the sklearn model
         st.subheader('Adaboost from sklearn')
-        clf_sklearn = classifier(n_estimators = 100, learning_rate=0.05, algorithm='SAMME')
+        clf_sklearn = classifier(n_estimators = 100, learning_rate=0.05)
         clf_sklearn.fit(X_train, y_train)
-        preds = clf_sklearn.predict(X_test)
-        plt(y_test, preds, classes)
+        sklearn_preds = clf_sklearn.predict(X_test)
+        st.markdown(f"##### Accuracy: {round(accuracy_score(y_test, sklearn_preds), 4)}")
+
+        dc_col21, dc_col22 = st.columns(2)
+
+        with dc_col21:
+            # Plotting the roc curve
+            plt_roc_curve(y_test, sklearn_preds)
+            
+        with dc_col22:
+            # Plotting the confusion matrix
+            plt_confusion_matrix(y_test, sklearn_preds, classes)

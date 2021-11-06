@@ -12,7 +12,7 @@ def plt_roc_curve(y_test, pred):
         x=fpr, y=tpr,
         title=f'ROC Curve (AUC={auc(fpr, tpr):.4f})',
         labels=dict(x='False Positive Rate', y='True Positive Rate'),
-        width=700, height=500
+        width=450, height=450
     )
     fig.add_shape(
         type='line', line=dict(dash='dash'),
@@ -52,5 +52,6 @@ def plt_confusion_matrix(y_test, pred, classes):
         "annotations": annotations
     }
     fig = go.Figure(data=data, layout=layout)
+    fig.update_layout(width = 450, height = 450)
     st.plotly_chart(fig)
 

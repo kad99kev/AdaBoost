@@ -1,1 +1,1 @@
-from .adaboost import AdaBoost
+from .adaboost import AdaBoostClassifier

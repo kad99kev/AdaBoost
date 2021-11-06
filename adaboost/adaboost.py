@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 from tree import DecisionTreeClassifier
 
 
-class AdaBoost:
+class AdaBoostClassifier:
     # https://web.stanford.edu/~hastie/Papers/SII-2-3-A8-Zhu.pdf
     def __init__(self, n_estimators=50, learning_rate=1.0):
         self.n_estimators = n_estimators
@@ -114,7 +114,7 @@ if __name__ == "__main__":
 
     y_train = np.array([1 if v == "yes" else -1 for v in y_train])
     y_test = np.array([1 if v == "yes" else -1 for v in y_test])
-    clf = AdaBoost(learning_rate=0.5)
+    clf = AdaBoostClassifier(learning_rate=0.5)
     clf.fit(X_train, y_train)
     pred = clf.predict(X_test)
     

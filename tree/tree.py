@@ -1,8 +1,7 @@
 import numpy as np
-import pandas as pd
 
-from node import Node
-from graph_utils import plot_graph
+from .node import Node
+from .tree_viz import plot_tree
 
 
 class DecisionTreeClassifier:
@@ -164,4 +163,4 @@ class DecisionTreeClassifier:
 
     def plot_tree(self):
         # Reverse and return so that the left most node is towards the start of the list
-        plot_graph(self.nodes[::-1], str(self.root))
+        plot_tree(self.nodes[::-1], str(self.root))

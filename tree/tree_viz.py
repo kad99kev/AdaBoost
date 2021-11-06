@@ -11,7 +11,7 @@ def remove_duplicates(sequence):
     return [x for x in sequence if not (x in seen or seen.add(x))]
 
 
-def plot_graph(nodes, root):
+def plot_tree(nodes, root):
     vertices = []
     for node in nodes:
         vertices.extend(node)

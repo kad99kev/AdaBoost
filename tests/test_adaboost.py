@@ -1,17 +1,16 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.metrics import roc_curve, auc
+
+from sklearn.tree import plot_tree
 from sklearn.tree import DecisionTreeClassifier as SKDTC
 from sklearn.ensemble import AdaBoostClassifier
-from sklearn.tree import plot_tree
-
 
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, confusion_matrix
-from sklearn.utils.class_weight import compute_sample_weight
+from sklearn.metrics import roc_curve, auc, accuracy_score
 
-from adaboost import AdaBoostClassifier
+from adaboost import AdaBoostClassifier as ABC
+from adaboost.tree import DecisionTreeClassifier as DTC
 
 
 def test_basic():
@@ -82,7 +81,7 @@ def train_sklearn_ada(X_train, y_train, X_test, y_test, sample_weights=None):
 
 
 def train_scratch_ada(X_train, y_train, X_test, y_test, sample_weights=None):
-    ada = AdaBoost()
+    ada = ABC()
     ada.fit(X_train, y_train, sample_weights)
     preds = ada.predict(X_test)
     plot_roc_curve(y_test, preds)
@@ -102,13 +101,25 @@ if __name__ == "__main__":
     y_train = np.array([1 if v == "yes" else -1 for v in y_train])
     y_test = np.array([1 if v == "yes" else -1 for v in y_test])
 
-    np.random.seed(0)
-    # sample_weights = np.arange(len(X_train)) + 1
-    # print(sample_weights)
-    sample_weights = compute_sample_weight("balanced", y_train)
-
-    print(train_scratch_dt(X_train, y_train, X_test, y_test))
-    print(train_sklearn_dt(X_train, y_train, X_test, y_test, viz=True))
+    print(
+        train_scratch_dt(
+            X_train,
+            y_train,
+            X_test,
+            y_test,
+            # sample_weights=np.array([np.random.random() for _ in range(len(X_train))]),
+        )
+    )
+    print(
+        train_sklearn_dt(
+            X_train,
+            y_train,
+            X_test,
+            y_test,
+            # sample_weights=np.array([np.random.random() for _ in range(len(X_train))]),
+            viz=True,
+        )
+    )
     assert train_sklearn_ada(X_train, y_train, X_test, y_test) == train_scratch_ada(
         X_train, y_train, X_test, y_test
     )

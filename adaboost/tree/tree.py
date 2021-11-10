@@ -168,12 +168,12 @@ class DecisionTreeClassifier:
             weight_left = len(y_left) / num_samples
             weight_right = len(y_right) / num_samples
 
-        # Calculate gain based on split.
-        gain = weight_left * self._compute_gini_index(
+        # Calculate Gini based on split.
+        gini = weight_left * self._compute_gini_index(
             y_left, sample_weights_left
         ) + weight_right * self._compute_gini_index(y_right, sample_weights_right)
 
-        return gain
+        return gini
 
     def _compute_gini_index(self, y, sample_weights):
         """

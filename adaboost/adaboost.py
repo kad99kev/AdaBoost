@@ -6,7 +6,6 @@ Class: MSc DA
 """
 
 import numpy as np
-from numpy.lib.arraysetops import unique
 import pandas as pd
 import plotly.graph_objects as go
 from .tree import DecisionTreeClassifier
@@ -106,10 +105,10 @@ class AdaBoostClassifier:
         pred = 0
         for (clf, a) in zip(self.models, self.alphas):
             # Gives us output of shape (n_classes, 1).
-            self.classes = clf.classes[:, np.newaxis]
-            # Initial shape, (2, *).
-            # Transposing gives us a shape of (*, 2).
-            pred += (clf.predict(X) == np.array(self.classes)).T * a
+            reshaped_classes = clf.classes[:, np.newaxis]
+            # Initial shape, (n_classes, *).
+            # Transposing gives us a shape of (*, n_classes).
+            pred += (clf.predict(X) == np.array(reshaped_classes)).T * a
 
         # Get the argmax from the predictions.
         pred = np.argmax(pred, axis=1)
@@ -133,13 +132,11 @@ if __name__ == "__main__":
     from sklearn.model_selection import train_test_split
     from sklearn.metrics import accuracy_score
 
-    classes = unique(y)
-
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, random_state=1, test_size=int(len(X) / 3)
     )
 
-    clf = AdaBoostClassifier(learning_rate=0.5)
+    clf = AdaBoostClassifier()
     clf.fit(X_train, y_train)
     pred = clf.predict(X_test)
     print(f"Accuracy: ", accuracy_score(y_test, pred))

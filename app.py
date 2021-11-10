@@ -1,13 +1,21 @@
+"""
+Written by:
+Name: Elita Menezes
+Student ID: 21237434
+Class: MSc DA
+"""
 
+from re import A
 import pandas as pd
 import streamlit as st
 
 from adaboost import AdaBoostClassifier
 from adaboost.viz import plt_roc_curve, plt_confusion_matrix
 
-from sklearn.ensemble import AdaBoostClassifier as classifier
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
+from sklearn.ensemble import AdaBoostClassifier as classifier
+
 
 
 def read_files(file):
@@ -79,15 +87,17 @@ if __name__ == '__main__':
 
         with dc_col11:
             # Plotting the roc curve
-            plt_roc_curve(y_test, scratch_preds)
+            fig = plt_roc_curve(y_test, scratch_preds)
+            st.plotly_chart(fig)
             
         with dc_col12:
             # Plotting the confusion matrix
-            plt_confusion_matrix(y_test, scratch_preds, classes)
+            fig = plt_confusion_matrix(y_test, scratch_preds, classes)
+            st.plotly_chart(fig)
 
         # Predicts using the sklearn model
-        st.subheader('Adaboost from sklearn')
-        clf_sklearn = classifier(n_estimators = 100, learning_rate=0.05)
+        st.subheader('Adaboost from sklearn (SAMME Algorithm)')
+        clf_sklearn = classifier(n_estimators = 100, learning_rate=0.05, algorithm="SAMME")
         clf_sklearn.fit(X_train, y_train)
         sklearn_preds = clf_sklearn.predict(X_test)
         st.markdown(f"##### Accuracy: {round(accuracy_score(y_test, sklearn_preds), 4)}")
@@ -96,8 +106,30 @@ if __name__ == '__main__':
 
         with dc_col21:
             # Plotting the roc curve
-            plt_roc_curve(y_test, sklearn_preds)
+            fig = plt_roc_curve(y_test, sklearn_preds)
+            st.plotly_chart(fig)
             
         with dc_col22:
             # Plotting the confusion matrix
-            plt_confusion_matrix(y_test, sklearn_preds, classes)
+            fig = plt_confusion_matrix(y_test, sklearn_preds, classes)
+            st.plotly_chart(fig)
+
+        # Predicts using the sklearn model SAMME.R
+        st.subheader('Adaboost from sklearn (SAMME.R Algorithm)')
+        clf_sklearn = classifier(n_estimators = 100, learning_rate=0.05, algorithm="SAMME.R")
+        clf_sklearn.fit(X_train, y_train)
+        sklearn_preds = clf_sklearn.predict(X_test)
+        st.markdown(f"##### Accuracy: {round(accuracy_score(y_test, sklearn_preds), 4)}")
+
+        dc_col21, dc_col22 = st.columns(2)
+
+        with dc_col21:
+            # Plotting the roc curve
+            fig = plt_roc_curve(y_test, sklearn_preds)
+            st.plotly_chart(fig)
+            
+        with dc_col22:
+            # Plotting the confusion matrix
+            fig = plt_confusion_matrix(y_test, sklearn_preds, classes)
+            st.plotly_chart(fig)
+

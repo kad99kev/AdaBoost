@@ -6,9 +6,11 @@ Class: MSc DA
 """
 
 import numpy as np
+from numpy.lib.arraysetops import unique
 import pandas as pd
 import plotly.graph_objects as go
 from .tree import DecisionTreeClassifier
+from .viz import plt_confusion_matrix, plt_roc_curve
 
 
 class AdaBoostClassifier:
@@ -114,10 +116,13 @@ class AdaBoostClassifier:
 
 
 if __name__ == "__main__":
+    
     df = pd.read_csv("wildfires.txt", sep="\t", header=0)
     X = df.drop(columns=["fire"])
     y = df.loc[:, "fire"]
     y = y.apply(lambda x: x.strip())
+    classes = unique(y)
+    y = np.array([1 if v == "yes" else -1 for v in y])
 
     from sklearn.model_selection import train_test_split
     from sklearn.metrics import accuracy_score
@@ -126,22 +131,12 @@ if __name__ == "__main__":
         X, y, random_state=0, test_size=int(len(X) / 3)
     )
 
-    y_train = np.array([1 if v == "yes" else -1 for v in y_train])
-    y_test = np.array([1 if v == "yes" else -1 for v in y_test])
     clf = AdaBoostClassifier(learning_rate=0.5)
     clf.fit(X_train, y_train)
     pred = clf.predict(X_test)
 
     print(f"Accuracy: ", accuracy_score(y_test, pred))
 
-    # clf.plot_error_rates()
-    # plot_roc_curve(y_test, pred)
+    plt_roc_curve(y_test, pred)
+    plt_confusion_matrix(y_test, pred, classes)
 
-"""
-The difference in the paper and sklearn.
-
-1. In the paper implementation, there is no learning rate. \
-    Should we implement the learning rate?
-2. The implementation of boosting sample weight is different in the paper and sklearn. \
-    Changing this formula helps us reproduce the sklearn implementation but deviates from the paper.
-"""

@@ -5,16 +5,25 @@ Student ID: 21237434
 Class: MSc DA
 """
 
-import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
 from sklearn.metrics import roc_curve, auc, confusion_matrix
 
 
 def plt_roc_curve(y_test, pred):
-    # https://plotly.com/python/roc-and-pr-curves/
+    """
+    Plots the roc curves for the test and pred.
+    Reference: https://plotly.com/python/roc-and-pr-curves/
+
+    Arguements:
+        y_test: list of y true values.
+        y_pred: list of y pred values.
+    """
+    assert len(y_test) == len(pred), "Length of y_test and pred should be equal"
+    # sklearn roc curve
     fpr, tpr, _ = roc_curve(y_test, pred)
 
+    # plotting graph using plotly.express
     fig = px.area(
         x=fpr,
         y=tpr,
@@ -27,16 +36,26 @@ def plt_roc_curve(y_test, pred):
 
     fig.update_yaxes(scaleanchor="x", scaleratio=1)
     fig.update_xaxes(constrain="domain")
-    st.plotly_chart(fig)
+    return fig
 
 
 def plt_confusion_matrix(y_test, pred, classes):
-    # https://stackoverflow.com/questions/60860121/plotly-how-to-make-an-annotated-confusion-matrix-using-a-heatmap
+    """
+    Plots the confusion matrix for the true and predicted values.
+    Reference: https://stackoverflow.com/questions/60860121/plotly-how-to-make-an-annotated-confusion-matrix-using-a-heatmap
+
+    Arguments:
+        y_test: list of y true values.
+        pred: list of predicted values.
+        classes: list of labels.
+    """
+    # sklearn confusion matrix
     confusion_mat = confusion_matrix(y_test, pred)
     print(confusion_mat)
     tp, fp, fn, tn = confusion_mat.ravel()
     print(tp, fp, fn, tn)
 
+    # plotting the heatmap using plotly.graph_objects
     data = go.Heatmap(
         z=[[fn, tn], [tp, fp]], y=classes[::-1], x=classes, colorscale="Reds"
     )
@@ -62,4 +81,4 @@ def plt_confusion_matrix(y_test, pred, classes):
     }
     fig = go.Figure(data=data, layout=layout)
     fig.update_layout(width=450, height=450)
-    st.plotly_chart(fig)
+    return fig

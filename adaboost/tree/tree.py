@@ -160,9 +160,11 @@ class DecisionTreeClassifier:
         # Get weights for left and right split.
         if sample_weights_left is not None and sample_weights_right is not None:
             # If using sample weight, get split weights based on it.
-            total_weight = sample_weights_left.sum() + sample_weights_right.sum()
-            weight_left = sample_weights_left.sum() / total_weight
-            weight_right = sample_weights_right.sum() / total_weight
+            weight_left = sample_weights_left.sum()
+            weight_right = sample_weights_right.sum()
+            total_weight = weight_left + weight_right
+            weight_left /= total_weight
+            weight_right /= total_weight
         else:
             # Else get split weights based on count.
             weight_left = len(y_left) / num_samples

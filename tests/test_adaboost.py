@@ -43,10 +43,11 @@ def test_adaboost():
     """
     Test the adaboost algorithm on the sklearn and scratch implementation
     """
-    df = pd.read_csv("wildfires.txt", sep="\t", header=0)
-    X = df.drop(columns=["fire"])
-    y = df.loc[:, "fire"]
+    df = pd.read_csv("Iris.csv", sep=",", header=0)
+    X = df.drop(columns=["Species"])
+    y = df.loc[:, "Species"]
     y = y.apply(lambda x: x.strip())
+    # print(y)
 
     history = []
     for i in range(10):
@@ -54,8 +55,8 @@ def test_adaboost():
             X, y, random_state=i, test_size=int(len(X) / 3)
         )
 
-        y_train = np.array([1 if v == "yes" else -1 for v in y_train])
-        y_test = np.array([1 if v == "yes" else -1 for v in y_test])
+        # y_train = np.array([1 if v == "yes" else -1 for v in y_train])
+        # y_test = np.array([1 if v == "yes" else -1 for v in y_test])
 
         sklearn_acc_samme = train_sklearn_SAMME(X_train, y_train, X_test, y_test)
         sklearn_acc_samme_R = train_sklearn_SAMMER_R(X_train, y_train, X_test, y_test)
@@ -73,7 +74,7 @@ def test_adaboost():
     )
     data = pd.DataFrame(data, columns=["Sklearn (SAMME)", "Sklearn (SAMME.R)", "Scratch"])
     data.insert(0, "Run", [i + 1 if i < 10 else "<b>Mean</b>" for i in range(11)])
-    plot_history(data, "adaboost")
+    plot_history(data, "adaboost_iris")
 
 
 if __name__ == "__main__":

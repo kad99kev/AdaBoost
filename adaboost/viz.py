@@ -5,6 +5,7 @@ Student ID: 21237434
 Class: MSc DA
 """
 
+import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from sklearn.metrics import roc_curve, auc, confusion_matrix
@@ -21,6 +22,8 @@ def plt_roc_curve(y_test, pred):
     """
     assert len(y_test) == len(pred), "Length of y_test and pred should be equal"
     # sklearn roc curve
+    y_test = np.array([1 if v == "yes" else -1 for v in y_test])
+    pred = np.array([1 if v == "yes" else -1 for v in y_test])
     fpr, tpr, _ = roc_curve(y_test, pred)
 
     # plotting graph using plotly.express

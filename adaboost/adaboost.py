@@ -64,6 +64,8 @@ class AdaBoostClassifier:
         N = len(y)
         sample_weights = np.ones(N) / N if sample_weights is None else sample_weights
         self.classes = np.unique(y)
+        k = len(self.classes)
+
 
         # For i in the range of n_estimators.
         for i in range(self.n_estimators):
@@ -76,12 +78,12 @@ class AdaBoostClassifier:
             # Compute error.
             # For all the incorrect predictions add their respective weights.
             incorrect = predictions != y
-            error = sum(sample_weights * incorrect) / sum(sample_weights)
+            error = sum(sample_weights * incorrect) / sum(sample_weights) 
             self.training_error[i] = error
 
             # Compute alpha.
             # Weight of the weak classifier.
-            alpha = self.learning_rate * (np.log((1 - error) / error))
+            alpha = (self.learning_rate * (np.log((1 - error) / error))) + np.log(k - 1)
 
             # Update the weights.
             # New weights is the prev weights * exponential of [alpha for all incorrect predictions].
@@ -111,32 +113,34 @@ class AdaBoostClassifier:
 
         # Get the argmax from the predictions.
         pred = np.argmax(pred, axis=1)
-        # Returns values in the form of [-1, 1].
-        return self.classes.take(pred > 0, axis=0)
+        # Returns values in the form of class names
+        return [self.classes[i] for i in pred]
 
 
 if __name__ == "__main__":
-    
-    df = pd.read_csv("wildfires.txt", sep="\t", header=0)
-    X = df.drop(columns=["fire"])
-    y = df.loc[:, "fire"]
+    # Testing on the wildfire dataset
+    # df = pd.read_csv("wildfires.txt", sep="\t", header=0)
+    # X = df.drop(columns=["fire"])
+    # y = df.loc[:, "fire"]
+    # y = y.apply(lambda x: x.strip()) 
+
+    # Testing on the iris dataset
+    df = pd.read_csv("Iris.csv", sep=",", header=0)
+    X = df.drop(columns=["Species"])
+    y = df.loc[:, "Species"]
     y = y.apply(lambda x: x.strip())
-    classes = unique(y)
-    y = np.array([1 if v == "yes" else -1 for v in y])
 
     from sklearn.model_selection import train_test_split
     from sklearn.metrics import accuracy_score
 
+    classes = unique(y)
+
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, random_state=0, test_size=int(len(X) / 3)
+        X, y, random_state=1, test_size=int(len(X) / 3)
     )
 
     clf = AdaBoostClassifier(learning_rate=0.5)
     clf.fit(X_train, y_train)
     pred = clf.predict(X_test)
-
     print(f"Accuracy: ", accuracy_score(y_test, pred))
-
-    plt_roc_curve(y_test, pred)
-    plt_confusion_matrix(y_test, pred, classes)
 

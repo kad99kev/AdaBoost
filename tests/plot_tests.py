@@ -28,7 +28,7 @@ def plot_roc_curve(y_test, pred, classifier, name):
 
     Arguements:
         y_test: list of y true values.
-        y_pred: list of y pred values.
+        pred: list of y pred values.
         classifier: Name of classifier.
         name: Name of the file.
     """

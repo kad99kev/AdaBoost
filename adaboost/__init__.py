@@ -1,3 +1,3 @@
-from .adaboost import AdaBoostClassifier
+from .adaboost import AdaBoostClassifierScratch
 
-__all__ = ["AdaBoostClassifier"]
+__all__ = ["AdaBoostClassifierScratch"]

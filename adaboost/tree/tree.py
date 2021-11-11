@@ -10,9 +10,10 @@ from .node import Node
 from .tree_viz import plot_tree
 
 
-class DecisionTreeClassifier:
+class DecisionTreeClassifierScratch:
     """
     This class implements the Decision Tree Classifier from scratch.
+    It uses the CART algorithm to build the tree.
 
     Arguments:
         max_depth: Maximum depth of the tree.

@@ -8,11 +8,10 @@ Class: MSc DA
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
-from .tree import DecisionTreeClassifier
-from .viz import plt_confusion_matrix, plt_roc_curve
+from .tree import DecisionTreeClassifierScratch
 
 
-class AdaBoostClassifier:
+class AdaBoostClassifierScratch:
     """
     This class implements the AdaBoost Classifier from scratch.
     Reference: https://web.stanford.edu/~hastie/Papers/SII-2-3-A8-Zhu.pdf
@@ -65,19 +64,18 @@ class AdaBoostClassifier:
         self.classes = np.unique(y)
         k = len(self.classes)
 
-
         # For i in the range of n_estimators.
         for i in range(self.n_estimators):
 
             # Fit the classifier with the updated weights.
-            clf = DecisionTreeClassifier(max_depth=1)
+            clf = DecisionTreeClassifierScratch(max_depth=1)
             clf.fit(X, y, sample_weight=sample_weights)
             predictions = clf.predict(X)
 
             # Compute error.
             # For all the incorrect predictions add their respective weights.
             incorrect = predictions != y
-            error = sum(sample_weights * incorrect) / sum(sample_weights) 
+            error = sum(sample_weights * incorrect) / sum(sample_weights)
             self.training_error[i] = error
 
             # Compute alpha.
@@ -114,39 +112,3 @@ class AdaBoostClassifier:
         pred = np.argmax(pred, axis=1)
         # Returns values in the form of class names
         return [self.classes[i] for i in pred]
-
-
-if __name__ == "__main__":
-    # Testing on the wildfire dataset
-    # df = pd.read_csv("wildfires.txt", sep="\t", header=0)
-    # X = df.drop(columns=["fire"])
-    # y = df.loc[:, "fire"]
-    # y = y.apply(lambda x: x.strip()) 
-
-    # Testing on the iris dataset
-    df = pd.read_csv("Iris.csv", sep=",", header=0)
-    X = df.drop(columns=["Species"])
-    y = df.loc[:, "Species"]
-    y = y.apply(lambda x: x.strip())
-
-    from sklearn.model_selection import train_test_split
-    from sklearn.metrics import accuracy_score
-
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, random_state=1, test_size=int(len(X) / 3)
-    )
-
-    classes = y.unique()
-
-    clf = AdaBoostClassifier()
-    clf.fit(X_train, y_train)
-    pred = clf.predict(X_test)
-    print(f"Accuracy: ", accuracy_score(y_test, pred))
-
-    fig = plt_confusion_matrix(y_test, pred, classes)
-    fig.show()
-
-    # fig = plt_roc_curve(y_test, pred)
-    # fig.show()
-
-

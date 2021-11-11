@@ -25,7 +25,7 @@ class AdaBoostClassifierScratch:
 
         self.models = [None] * n_estimators  # Stores the model after each iteration.
         self.alphas = [None] * n_estimators  # Stores the weights after each iteration.
-        self.training_error = [
+        self.errors = [
             None
         ] * n_estimators  # Stores the training error after each iteration.
 
@@ -57,7 +57,7 @@ class AdaBoostClassifierScratch:
             # For all the incorrect predictions add their respective weights.
             incorrect = predictions != y
             error = sum(sample_weights * incorrect) / sum(sample_weights)
-            self.training_error[i] = error
+            self.errors[i] = error
 
             # Compute alpha.
             # Weight of the weak classifier.

@@ -12,7 +12,8 @@ from .plot_tests import (
     plot_history,
     plot_roc_curve,
     plot_confusion_matrix,
-    plot_error_rates,
+    plot_errors,
+    plot_weights,
 )
 
 
@@ -86,7 +87,8 @@ def additional_visualisations(X, y, dataset_name):
     clf = AdaBoostClassifierScratch()
     clf.fit(X_train, y_train)
     pred = clf.predict(X_test)
-    plot_error_rates(clf.n_estimators, clf.training_error, "adaboost", file_name)
+    plot_errors(clf.n_estimators, clf.errors, "adaboost", file_name)
+    plot_weights(clf.n_estimators, clf.alphas, "adaboost", file_name)
     plot_confusion_matrix(y_test, pred, clf.classes, "adaboost", file_name)
     if len(clf.classes) == 2:
         plot_roc_curve(y_test, pred, "adaboost", file_name)
@@ -96,7 +98,8 @@ def additional_visualisations(X, y, dataset_name):
     clf = SklearnAdaBoost(n_estimators=50, algorithm="SAMME")
     clf.fit(X_train, y_train)
     pred = clf.predict(X_test)
-    plot_error_rates(clf.n_estimators, clf.estimator_errors_, "adaboost", file_name)
+    plot_errors(clf.n_estimators, clf.estimator_errors_, "adaboost", file_name)
+    plot_weights(clf.n_estimators, clf.estimator_weights_, "adaboost", file_name)
     plot_confusion_matrix(y_test, pred, clf.classes_, "adaboost", file_name)
     if len(clf.classes_) == 2:
         plot_roc_curve(y_test, pred, "adaboost", file_name)

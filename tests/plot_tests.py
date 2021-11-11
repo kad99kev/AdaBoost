@@ -116,23 +116,45 @@ def plot_confusion_matrix(y_test, pred, classes, classifier, name):
     fig.write_image(f"images/{classifier}/confusion_matrix/{name}.png")
 
 
-def plot_error_rates(n_estimators, training_errors, classifier, name):
+def plot_errors(n_estimators, estimator_errors, classifier, name):
     """
-    Plotting the error rate for each iteration.
+    Plotting the error rate for each estimator.
 
     Arguments:
         n_estimators: Number of estimators.
-        training_errors: Training errors at each iteration.
+        estimator_errors: Training errors for each estimator.
         classifier: Name of classifier.
         name: Name of the file.
     """
 
     fig = go.Figure(
-        data=go.Scatter(x=[i for i in range(n_estimators)], y=training_errors)
+        data=go.Scatter(x=[i for i in range(n_estimators)], y=estimator_errors)
     )
     fig.update_layout(
-        title="Error rates for each iteration",
-        xaxis_title="Iteration",
+        title="Error rates for each estimator",
+        xaxis_title="Estimator",
         yaxis_title="Error",
     )
-    fig.write_image(f"images/{classifier}/error_rate/{name}.png")
+    fig.write_image(f"images/{classifier}/estimator_errors/{name}.png")
+
+
+def plot_weights(n_estimators, estimator_weights, classifier, name):
+    """
+    Plotting the weights for each estimator.
+
+    Arguments:
+        n_estimators: Number of estimators.
+        estimator_weights: Weights for each estimator.
+        classifier: Name of classifier.
+        name: Name of the file.
+    """
+
+    fig = go.Figure(
+        data=go.Scatter(x=[i for i in range(n_estimators)], y=estimator_weights)
+    )
+    fig.update_layout(
+        title="Weights for each estimator",
+        xaxis_title="Estimator",
+        yaxis_title="Weight",
+    )
+    fig.write_image(f"images/{classifier}/estimator_weights/{name}.png")

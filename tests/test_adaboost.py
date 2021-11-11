@@ -70,7 +70,7 @@ def train_scratch(X_train, y_train, X_test, y_test, sample_weights=None):
 
 def additional_visualisations(X, y, dataset_name):
     """
-    Plot confusion matrices and ROC Curves for the scratch implementation.
+    Plot confusion matrices and ROC Curves for comparison.
 
     Arguments:
         X: Inputs to the model.

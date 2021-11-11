@@ -5,7 +5,6 @@ Student ID: 21237434
 Class: MSc DA
 """
 
-from re import A
 import pandas as pd
 import streamlit as st
 
@@ -32,22 +31,6 @@ def read_files(file):
     return X, y
 
 
-def convert_y(y):
-    """
-    Converts y variable to {-1, 1}.
-    Operation suitable for binary classification only.
-
-    Arguments:
-        y: list of elements having binary class.
-    """
-    # find unique values
-    classes = y.unique()
-    # assign -1 to one variable and 1 to another
-    y[y == classes[0]] = -1
-    y[y == classes[1]] = 1
-    y = y.astype(str).astype(int)
-    return y, classes
-
 
 def split_data(X, y):
     """
@@ -58,7 +41,7 @@ def split_data(X, y):
         y: Tagret values.
     """
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, random_state=1, test_size=int(len(X) / 3)
+        X, y, random_state=25, test_size=int(len(X) / 3)
     )
     return X_train, X_test, y_train, y_test
 
@@ -70,8 +53,7 @@ if __name__ == "__main__":
     uploaded_file = st.file_uploader("Add a csv or txt file")
     if uploaded_file:
         X, y = read_files(uploaded_file)
-        y, classes = convert_y(y)
-
+        classes = y.unique()
         # Splits the data into test and train
         X_train, X_test, y_train, y_test = split_data(X, y)
 
@@ -80,21 +62,20 @@ if __name__ == "__main__":
         clf_scratch = AdaBoostClassifierScratch(n_estimators=100, learning_rate=0.05)
         clf_scratch.fit(X_train, y_train)
         pred = clf_scratch.predict(X_test)
-        scratch_preds = pd.Series((p[0] for p in pred))
         st.markdown(
-            f"##### Accuracy: {round(accuracy_score(y_test, scratch_preds), 4)}"
+            f"##### Accuracy: {round(accuracy_score(y_test, pred), 4)}"
         )
 
         dc_col11, dc_col12 = st.columns(2)
 
         with dc_col11:
             # Plotting the roc curve
-            fig = plt_roc_curve(y_test, scratch_preds)
+            fig = plt_roc_curve(y_test, pred)
             st.plotly_chart(fig)
 
         with dc_col12:
             # Plotting the confusion matrix
-            fig = plt_confusion_matrix(y_test, scratch_preds, classes)
+            fig = plt_confusion_matrix(y_test, pred, classes)
             st.plotly_chart(fig)
 
         # Predicts using the sklearn model

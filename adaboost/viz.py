@@ -8,16 +8,15 @@ Class: MSc DA
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
+import plotly.figure_factory as ff
 from sklearn.metrics import roc_curve, auc, confusion_matrix
 
-"""
-Only suitable for binary class labels
-"""
 
 def plt_roc_curve(y_test, pred):
     """
     Plots the roc curves for the test and pred.
     Reference: https://plotly.com/python/roc-and-pr-curves/
+    Only suitable for binary class labels
 
     Arguements:
         y_test: list of y true values.
@@ -55,36 +54,41 @@ def plt_confusion_matrix(y_test, pred, classes):
         pred: list of predicted values.
         classes: list of labels.
     """
-    # sklearn confusion matrix
-    confusion_mat = confusion_matrix(y_test, pred)
-    print(confusion_mat)
-    tp, fp, fn, tn = confusion_mat.ravel()
-    print(tp, fp, fn, tn)
+    confusion_mat = confusion_matrix(y_test, pred).tolist()
+    x = classes.tolist()
+    y = classes.tolist()
 
-    # plotting the heatmap using plotly.graph_objects
-    data = go.Heatmap(
-        z=[[fn, tn], [tp, fp]], y=classes[::-1], x=classes, colorscale="Reds"
-    )
-    annotations = []
-    for i, row in enumerate(confusion_mat.T):
-        for j, value in enumerate(row):
-            annotations.append(
-                {
-                    "x": classes[i],
-                    "y": classes[j],
-                    "font": {"color": "black", "size": 18},
-                    "text": str(value),
-                    "xref": "x1",
-                    "yref": "y1",
-                    "showarrow": False,
-                }
-            )
-    layout = {
-        "title": "Confusion matrix",
-        "xaxis": {"title": "Predicted value"},
-        "yaxis": {"title": "Real value"},
-        "annotations": annotations,
-    }
-    fig = go.Figure(data=data, layout=layout)
-    fig.update_layout(width=450, height=450)
+    # change each element of z to type string for annotations
+    z_text = [[str(y) for y in x] for x in confusion_mat]
+
+    # set up figure 
+    fig = ff.create_annotated_heatmap(confusion_mat, x = x, y = y, annotation_text = z_text, colorscale='Reds')
+
+    # add title
+    fig.update_layout(title_text='<i><b>Confusion matrix</b></i>')
+
+    # add custom xaxis title
+    fig.add_annotation(dict(font=dict(color="black",size=14),
+                            x=0.5,
+                            y=-0.15,
+                            showarrow=False,
+                            text="Predicted value",
+                            xref="paper",
+                            yref="paper"))
+
+    # add custom yaxis title
+    fig.add_annotation(dict(font=dict(color="black",size=14),
+                            x=-0.35,
+                            y=0.5,
+                            showarrow=False,
+                            text="Real value",
+                            textangle=-90,
+                            xref="paper",
+                            yref="paper"))
+
+    # adjust margins to make room for yaxis title
+    fig.update_layout(margin=dict(t=50, l=200))
+
+    # add colorbar
+    fig['data'][0]['showscale'] = True
     return fig

@@ -55,9 +55,6 @@ def test_adaboost():
             X, y, random_state=i, test_size=int(len(X) / 3)
         )
 
-        # y_train = np.array([1 if v == "yes" else -1 for v in y_train])
-        # y_test = np.array([1 if v == "yes" else -1 for v in y_test])
-
         sklearn_acc_samme = train_sklearn_SAMME(X_train, y_train, X_test, y_test)
         sklearn_acc_samme_R = train_sklearn_SAMMER_R(X_train, y_train, X_test, y_test)
         scratch_acc = train_scratch(X_train, y_train, X_test, y_test)

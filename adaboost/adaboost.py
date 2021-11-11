@@ -124,9 +124,9 @@ if __name__ == "__main__":
     # y = y.apply(lambda x: x.strip()) 
 
     # Testing on the iris dataset
-    df = pd.read_csv("Iris.csv", sep=",", header=0)
-    X = df.drop(columns=["Species"])
-    y = df.loc[:, "Species"]
+    df = pd.read_csv("wildfires.txt", sep="\t", header=0)
+    X = df.drop(columns=["fire"])
+    y = df.loc[:, "fire"]
     y = y.apply(lambda x: x.strip())
 
     from sklearn.model_selection import train_test_split
@@ -136,8 +136,14 @@ if __name__ == "__main__":
         X, y, random_state=1, test_size=int(len(X) / 3)
     )
 
+    classes = y.unique()
+
     clf = AdaBoostClassifier()
     clf.fit(X_train, y_train)
     pred = clf.predict(X_test)
     print(f"Accuracy: ", accuracy_score(y_test, pred))
+
+    # fig = plt_roc_curve(y_test, pred)
+    # fig.show()
+
 

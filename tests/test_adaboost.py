@@ -8,7 +8,12 @@ from sklearn.metrics import accuracy_score
 from sklearn.ensemble import AdaBoostClassifier as SklearnAdaBoost
 
 from adaboost import AdaBoostClassifierScratch
-from .plot_tests import plot_history, plot_roc_curve, plot_confusion_matrix
+from .plot_tests import (
+    plot_history,
+    plot_roc_curve,
+    plot_confusion_matrix,
+    plot_error_rates,
+)
 
 
 def train_sklearn_SAMME(X_train, y_train, X_test, y_test, sample_weights=None):
@@ -62,7 +67,7 @@ def train_scratch(X_train, y_train, X_test, y_test, sample_weights=None):
     return accuracy_score(y_test, preds)
 
 
-def visualise_scratch(X, y, dataset_name):
+def additional_visualisations(X, y, dataset_name):
     """
     Plot confusion matrices and ROC Curves for the scratch implementation.
 
@@ -71,15 +76,30 @@ def visualise_scratch(X, y, dataset_name):
         y: The target values.
         dataset_name: Name of the dataset.
     """
+    # Split data.
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, random_state=100, test_size=int(len(X) / 3)
     )
+
+    # Plot for Scratch.
+    file_name = f"scratch_{dataset_name}"
     clf = AdaBoostClassifierScratch()
     clf.fit(X_train, y_train)
     pred = clf.predict(X_test)
-    plot_confusion_matrix(y_test, pred, clf.classes, f"adaboost_{dataset_name}")
+    plot_error_rates(clf.n_estimators, clf.training_error, "adaboost", file_name)
+    plot_confusion_matrix(y_test, pred, clf.classes, "adaboost", file_name)
     if len(clf.classes) == 2:
-        plot_roc_curve(y_test, pred, f"adaboost_{dataset_name}")
+        plot_roc_curve(y_test, pred, "adaboost", file_name)
+
+    # Plot for Sklearn.
+    file_name = f"sklearn_{dataset_name}"
+    clf = SklearnAdaBoost(n_estimators=50, algorithm="SAMME")
+    clf.fit(X_train, y_train)
+    pred = clf.predict(X_test)
+    plot_error_rates(clf.n_estimators, clf.estimator_errors_, "adaboost", file_name)
+    plot_confusion_matrix(y_test, pred, clf.classes_, "adaboost", file_name)
+    if len(clf.classes_) == 2:
+        plot_roc_curve(y_test, pred, "adaboost", file_name)
 
 
 def test_adaboost(dataset):
@@ -128,10 +148,10 @@ def test_adaboost(dataset):
         data, columns=["Sklearn (SAMME.R)", "Sklearn (SAMME)", "Scratch"]
     )
     data.insert(0, "Run", [i + 1 if i < 10 else "<b>Mean</b>" for i in range(11)])
-    plot_history(data, f"adaboost_{dataset_name}")
+    plot_history(data, "adaboost", dataset_name)
 
     # Visualise the scratch implementation.
-    visualise_scratch(X, y, dataset_name)
+    additional_visualisations(X, y, dataset_name)
 
 
 if __name__ == "__main__":

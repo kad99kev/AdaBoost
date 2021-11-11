@@ -1,24 +1,26 @@
 import numpy as np
 
 import plotly.express as px
+import plotly.graph_objects as go
 import plotly.figure_factory as ff
 
 from sklearn.metrics import roc_curve, auc, confusion_matrix
 
 
-def plot_history(data, name):
+def plot_history(data, classifier, name):
     """
     Plots the histories of the test runs.
 
     Arguments:
         data: History data.
-        column_names: Names of the columns.
+        classifier: Name of classifier.
+        name: Name of the file.
     """
     fig = ff.create_table(data)
-    fig.write_image(f"images/tests/history/{name}.png")
+    fig.write_image(f"images/{classifier}/history/{name}.png")
 
 
-def plot_roc_curve(y_test, pred, name):
+def plot_roc_curve(y_test, pred, classifier, name):
     """
     Plots the roc curves for the test and pred.
     Reference: https://plotly.com/python/roc-and-pr-curves/
@@ -27,6 +29,8 @@ def plot_roc_curve(y_test, pred, name):
     Arguements:
         y_test: list of y true values.
         y_pred: list of y pred values.
+        classifier: Name of classifier.
+        name: Name of the file.
     """
     assert len(y_test) == len(pred), "Length of y_test and pred should be equal"
     # sklearn roc curve
@@ -47,10 +51,10 @@ def plot_roc_curve(y_test, pred, name):
 
     fig.update_yaxes(scaleanchor="x", scaleratio=1)
     fig.update_xaxes(constrain="domain")
-    fig.write_image(f"images/tests/roc_curve/{name}.png")
+    fig.write_image(f"images/{classifier}/roc_curve/{name}.png")
 
 
-def plot_confusion_matrix(y_test, pred, classes, name):
+def plot_confusion_matrix(y_test, pred, classes, classifier, name):
     """
     Plots the confusion matrix for the true and predicted values.
     Reference: https://stackoverflow.com/questions/60860121/plotly-how-to-make-an-annotated-confusion-matrix-using-a-heatmap
@@ -59,6 +63,8 @@ def plot_confusion_matrix(y_test, pred, classes, name):
         y_test: list of y true values.
         pred: list of predicted values.
         classes: list of labels.
+        classifier: Name of classifier.
+        name: Name of the file.
     """
     confusion_mat = confusion_matrix(y_test, pred).tolist()
     x = classes.tolist()
@@ -107,4 +113,26 @@ def plot_confusion_matrix(y_test, pred, classes, name):
 
     # add colorbar
     fig["data"][0]["showscale"] = True
-    fig.write_image(f"images/tests/confusion_matrix/{name}.png")
+    fig.write_image(f"images/{classifier}/confusion_matrix/{name}.png")
+
+
+def plot_error_rates(n_estimators, training_errors, classifier, name):
+    """
+    Plotting the error rate for each iteration.
+
+    Arguments:
+        n_estimators: Number of estimators.
+        training_errors: Training errors at each iteration.
+        classifier: Name of classifier.
+        name: Name of the file.
+    """
+
+    fig = go.Figure(
+        data=go.Scatter(x=[i for i in range(n_estimators)], y=training_errors)
+    )
+    fig.update_layout(
+        title="Error rates for each iteration",
+        xaxis_title="Iteration",
+        yaxis_title="Error",
+    )
+    fig.write_image(f"images/{classifier}/error_rate/{name}.png")

@@ -6,8 +6,6 @@ Class: MSc DA
 """
 
 import numpy as np
-import pandas as pd
-import plotly.graph_objects as go
 from .tree import DecisionTreeClassifierScratch
 
 
@@ -30,23 +28,6 @@ class AdaBoostClassifierScratch:
         self.training_error = [
             None
         ] * n_estimators  # Stores the training error after each iteration.
-
-    def plot_error_rates(self):
-        """
-        Plotting the error rate for each iteration.
-        """
-
-        fig = go.Figure(
-            data=go.Scatter(
-                x=[i for i in range(self.n_estimators)], y=self.training_error
-            )
-        )
-        fig.update_layout(
-            title="Error rates for each iteration",
-            xaxis_title="Iteration",
-            yaxis_title="Error",
-        )
-        fig.show()
 
     def fit(self, X, y, sample_weights=None):
         """

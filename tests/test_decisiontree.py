@@ -46,7 +46,7 @@ def train_sklearn_dt(X_train, y_train, X_test, y_test, sample_weights=None):
     return accuracy_score(y_test, preds)
 
 
-def visualise_scratch(X, y, dataset_name):
+def additional_visualisations(X, y, dataset_name):
     """
     Plot confusion matrices and ROC Curves for the scratch implementation.
 
@@ -61,9 +61,16 @@ def visualise_scratch(X, y, dataset_name):
     clf = DecisionTreeClassifierScratch()
     clf.fit(X_train, y_train)
     pred = clf.predict(X_test)
-    plot_confusion_matrix(y_test, pred, clf.classes, f"cart_{dataset_name}")
+    plot_confusion_matrix(y_test, pred, clf.classes, "cart", f"scratch_{dataset_name}")
     if len(clf.classes) == 2:
-        plot_roc_curve(y_test, pred, f"cart_{dataset_name}")
+        plot_roc_curve(y_test, pred, "cart", f"scratch_{dataset_name}")
+
+    dt = SklearnDecisionTree(max_depth=1)
+    dt.fit(X_train, y_train)
+    preds = dt.predict(X_test)
+    plot_confusion_matrix(y_test, pred, clf.classes, "cart", f"sklearn_{dataset_name}")
+    if len(clf.classes) == 2:
+        plot_roc_curve(y_test, pred, "cart", f"sklearn_{dataset_name}")
 
 
 def test_decisiontree(dataset):
@@ -109,10 +116,10 @@ def test_decisiontree(dataset):
     )
     data = pd.DataFrame(data, columns=["Sklearn", "Scratch"])
     data.insert(0, "Run", [i + 1 if i < 10 else "<b>Mean</b>" for i in range(11)])
-    plot_history(data, f"cart_{dataset_name}")
+    plot_history(data, "cart", dataset_name)
 
     # Visualise the scratch implementation.
-    visualise_scratch(X, y, dataset_name)
+    additional_visualisations(X, y, dataset_name)
 
 
 if __name__ == "__main__":

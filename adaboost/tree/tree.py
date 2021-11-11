@@ -15,6 +15,10 @@ class DecisionTreeClassifierScratch:
     This class implements the Decision Tree Classifier from scratch.
     It uses the CART algorithm to build the tree.
 
+    I had previously implemented the CART algorithm in my undergrad. Link to that code: https://drive.google.com/file/d/1E7_B4T-yrhITz2BO1gcyj3PGbW5KJyxp/view?usp=sharing
+    Reference: https://towardsdatascience.com/decision-tree-from-scratch-in-python-46e99dfea775
+
+
     Arguments:
         max_depth: Maximum depth of the tree.
     """
@@ -24,7 +28,7 @@ class DecisionTreeClassifierScratch:
         self.root = None
         self.nodes = []
 
-    def _build_tree(self, X, y, sample_weight=None, current_depth=0):
+    def _build_tree(self, X, y, sample_weights=None, current_depth=0):
         """
         Build the Decision Tree.
 
@@ -36,20 +40,20 @@ class DecisionTreeClassifierScratch:
         """
 
         # Calculate values based on either sample weights if provided or class counts.
-        if sample_weight is not None:
-            value = [sample_weight[y == c].sum() for c in self.classes]
+        if sample_weights is not None:
+            value = [sample_weights[y == c].sum() for c in self.classes]
         else:
             value = [np.count_nonzero(y == c) for c in self.classes]
         prediction = self.classes[np.argmax(value)]
 
         # Initially create a leaf node.
         node = Node(
-            self._compute_gini_index(y, sample_weight), value, len(y), prediction
+            self._compute_gini_index(y, sample_weights), value, len(y), prediction
         )
 
         # Check if exceeds depth
         if current_depth < self.max_depth:
-            best_split = self._get_split(X, y, sample_weight)
+            best_split = self._get_split(X, y, sample_weights)
 
             if best_split["idx"] is not None:
 
@@ -59,10 +63,10 @@ class DecisionTreeClassifierScratch:
                 X_right, y_right = X[~left_indices], y[~left_indices]
 
                 sample_weight_left, sample_weight_right = None, None
-                if sample_weight is not None:
+                if sample_weights is not None:
                     sample_weight_left, sample_weight_right = (
-                        sample_weight[left_indices],
-                        sample_weight[~left_indices],
+                        sample_weights[left_indices],
+                        sample_weights[~left_indices],
                     )
 
                 # Building a node with max leaf nodes = 2
@@ -200,6 +204,21 @@ class DecisionTreeClassifierScratch:
 
             return 1.0 - sum((n / num_samples) ** 2 for n in classes_count)
 
+    def _predict(self, X_):
+        """
+        Recursively iterate through the tree to obtain predictions.
+
+        Arguments:
+            X_: Current input split.
+        """
+        node = self.root
+        while hasattr(node, "left"):
+            if X_[node.feature] <= node.threshold:
+                node = node.left
+            else:
+                node = node.right
+        return node.prediction
+
     def fit(self, X, y, sample_weight=None):
         """
         Fit the Decision Tree based on given data.
@@ -222,21 +241,6 @@ class DecisionTreeClassifierScratch:
             X: Inputs to the tree.
         """
         return [self._predict(X_) for X_ in np.array(X)]
-
-    def _predict(self, X_):
-        """
-        Recursively iterate through the tree to obtain predictions.
-
-        Arguments:
-            X_: Current input split.
-        """
-        node = self.root
-        while hasattr(node, "left"):
-            if X_[node.feature] <= node.threshold:
-                node = node.left
-            else:
-                node = node.right
-        return node.prediction
 
     def plot_tree(self):
         """

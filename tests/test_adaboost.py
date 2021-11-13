@@ -42,7 +42,7 @@ def train_sklearn_SAMME(
     return preds
 
 
-def train_sklearn_SAMMER_R(
+def train_sklearn_SAMMER(
     X_train, y_train, X_test, sample_weights=None, return_clf=False
 ):
     """
@@ -194,7 +194,7 @@ def test_adaboost(dataset):
         )
 
         # Train models and add to history.
-        preds_sammer = train_sklearn_SAMMER_R(X_train, y_train, X_test)
+        preds_sammer = train_sklearn_SAMMER(X_train, y_train, X_test)
         preds_samme = train_sklearn_SAMME(X_train, y_train, X_test)
         preds_scratch = train_scratch(X_train, y_train, X_test)
         history.append(

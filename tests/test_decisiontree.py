@@ -15,8 +15,8 @@ from sklearn.metrics import accuracy_score
 from sklearn.tree import DecisionTreeClassifier as SklearnDecisionTree
 
 from adaboost.tree import DecisionTreeClassifierScratch
-
-from .plot_tests import plot_history, plot_confusion_matrix, plot_roc_curve
+from adaboost.viz import plt_confusion_matrix, plt_roc_curve
+from .plot_tests import plot_history
 
 
 def train_scratch_dt(X_train, y_train, X_test, sample_weights=None, return_clf=False):
@@ -65,9 +65,11 @@ def run_plots(y_test, preds, classes, file_name):
         classes: The classes identified by the classifier.
         file_name: File name for saving the image.
     """
-    plot_confusion_matrix(y_test, preds, classes, "cart", file_name)
+    conf_fig = plt_confusion_matrix(y_test, preds, classes)
+    conf_fig.write_image(f"images/cart/confusion_matrix/{file_name}.png")
     if len(classes) == 2:
-        plot_roc_curve(y_test, preds, "cart", file_name)
+        roc_fig = plt_roc_curve(y_test, preds)
+        roc_fig.write_image(f"images/cart/roc_curve/{file_name}.png")
 
 
 def additional_visualisations(X, y, dataset_name):

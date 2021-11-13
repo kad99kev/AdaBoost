@@ -8,10 +8,9 @@ from sklearn.metrics import accuracy_score
 from sklearn.ensemble import AdaBoostClassifier as SklearnAdaBoost
 
 from adaboost import AdaBoostClassifierScratch
+from adaboost.viz import plt_confusion_matrix, plt_roc_curve
 from .plot_tests import (
     plot_history,
-    plot_roc_curve,
-    plot_confusion_matrix,
     plot_errors,
     plot_weights,
 )
@@ -22,9 +21,9 @@ def train_sklearn_SAMME(
 ):
     """
     Written by:
-    Name: Kevlyn Kadamala
-    Student ID: 21236191
-    Class: MSc AI
+    Name: Elita Menezes
+    Student ID: 21237434
+    Class: MSc DA
 
     Training the sklearn model using SAMME algorithm.
 
@@ -70,9 +69,9 @@ def train_sklearn_SAMMER(
 def train_scratch(X_train, y_train, X_test, sample_weights=None, return_clf=False):
     """
     Written by:
-    Name: Kevlyn Kadamala
-    Student ID: 21236191
-    Class: MSc AI
+    Name: Elita Menezes
+    Student ID: 21237434
+    Class: MSc DA
 
     Training Adaboost from scratch.
 
@@ -92,6 +91,11 @@ def train_scratch(X_train, y_train, X_test, sample_weights=None, return_clf=Fals
 
 def run_plots(y_test, preds, classes, n_estimators, errors, alphas, file_name):
     """
+    Written by:
+    Name: Kevlyn Kadamala
+    Student ID: 21236191
+    Class: MSc AI
+
     Plots errors, weights, confusion matrix and the ROC curve.
 
     Arguments:
@@ -105,9 +109,11 @@ def run_plots(y_test, preds, classes, n_estimators, errors, alphas, file_name):
     """
     plot_errors(n_estimators, errors, "adaboost", file_name)
     plot_weights(n_estimators, alphas, "adaboost", file_name)
-    plot_confusion_matrix(y_test, preds, classes, "adaboost", file_name)
+    conf_fig = plt_confusion_matrix(y_test, preds, classes)
+    conf_fig.write_image(f"images/adaboost/confusion_matrix/{file_name}.png")
     if len(classes) == 2:
-        plot_roc_curve(y_test, preds, "adaboost", file_name)
+        roc_fig = plt_roc_curve(y_test, preds)
+        roc_fig.write_image(f"images/adaboost/roc_curve/{file_name}.png")
 
 
 def additional_visualisations(X, y, dataset_name):
@@ -165,9 +171,9 @@ def additional_visualisations(X, y, dataset_name):
 def test_adaboost(dataset):
     """
     Written by:
-    Name: Kevlyn Kadamala
-    Student ID: 21236191
-    Class: MSc AI
+    Name: Elita Menezes
+    Student ID: 21237434
+    Class: MSc DA
 
     Test the Adaboost algorithm on the sklearn and scratch implementation.
 

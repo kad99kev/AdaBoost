@@ -19,7 +19,7 @@ from adaboost.tree import DecisionTreeClassifierScratch
 from .plot_tests import plot_history, plot_confusion_matrix, plot_roc_curve
 
 
-def train_scratch_dt(X_train, y_train, X_test, y_test, sample_weights=None):
+def train_scratch_dt(X_train, y_train, X_test, sample_weights=None, return_clf=False):
     """
     Training Decision Tree from scratch.
 
@@ -27,16 +27,17 @@ def train_scratch_dt(X_train, y_train, X_test, y_test, sample_weights=None):
         X_train: Training inputs split.
         y_train: Training targets split.
         X_test: Testing inputs split.
-        y_test: Testing targets split.
         sample_weights: Sample weights to be used.
     """
     dt = DecisionTreeClassifierScratch(max_depth=1)
     dt.fit(X_train, y_train, sample_weights)
     preds = dt.predict(X_test)
-    return accuracy_score(y_test, preds)
+    if return_clf:
+        return preds, dt
+    return preds
 
 
-def train_sklearn_dt(X_train, y_train, X_test, y_test, sample_weights=None):
+def train_sklearn_dt(X_train, y_train, X_test, sample_weights=None, return_clf=False):
     """
     Training the sklearn model.
 
@@ -44,13 +45,29 @@ def train_sklearn_dt(X_train, y_train, X_test, y_test, sample_weights=None):
         X_train: Training inputs split.
         y_train: Training targets split.
         X_test: Testing inputs split.
-        y_test: Testing targets split.
         sample_weights: Sample weights to be used.
     """
     dt = SklearnDecisionTree(max_depth=1)
     dt.fit(X_train, y_train, sample_weight=sample_weights)
     preds = dt.predict(X_test)
-    return accuracy_score(y_test, preds)
+    if return_clf:
+        return preds, dt
+    return preds
+
+
+def run_plots(y_test, preds, classes, file_name):
+    """
+    Plots the confusion matrix and the ROC curve.
+
+    Arguments:
+        y_test: Testing targets split.
+        preds: Predictions from classifier.
+        classes: The classes identified by the classifier.
+        file_name: File name for saving the image.
+    """
+    plot_confusion_matrix(y_test, preds, classes, "cart", file_name)
+    if len(classes) == 2:
+        plot_roc_curve(y_test, preds, "cart", file_name)
 
 
 def additional_visualisations(X, y, dataset_name):
@@ -65,19 +82,16 @@ def additional_visualisations(X, y, dataset_name):
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, random_state=100, test_size=int(len(X) / 3)
     )
-    clf = DecisionTreeClassifierScratch()
-    clf.fit(X_train, y_train)
-    pred = clf.predict(X_test)
-    plot_confusion_matrix(y_test, pred, clf.classes, "cart", f"scratch_{dataset_name}")
-    if len(clf.classes) == 2:
-        plot_roc_curve(y_test, pred, "cart", f"scratch_{dataset_name}")
 
-    dt = SklearnDecisionTree(max_depth=1)
-    dt.fit(X_train, y_train)
-    preds = dt.predict(X_test)
-    plot_confusion_matrix(y_test, pred, clf.classes, "cart", f"sklearn_{dataset_name}")
-    if len(clf.classes) == 2:
-        plot_roc_curve(y_test, pred, "cart", f"sklearn_{dataset_name}")
+    scratch_preds, scratch_clf = train_scratch_dt(
+        X_train, y_train, X_test, return_clf=True
+    )
+    run_plots(y_test, scratch_preds, scratch_clf.classes, f"scratch_{dataset_name}")
+
+    sklearn_preds, sklearn_clf = train_sklearn_dt(
+        X_train, y_train, X_test, return_clf=True
+    )
+    run_plots(y_test, sklearn_preds, sklearn_clf.classes_, f"sklearn_{dataset_name}")
 
 
 def test_decisiontree(dataset):
@@ -107,9 +121,14 @@ def test_decisiontree(dataset):
         )
 
         # Train models and add to history.
-        sklearn_acc = train_sklearn_dt(X_train, y_train, X_test, y_test)
-        scratch_acc = train_scratch_dt(X_train, y_train, X_test, y_test)
-        history.append((sklearn_acc, scratch_acc))
+        sklearn_preds = train_sklearn_dt(X_train, y_train, X_test)
+        scratch_preds = train_scratch_dt(X_train, y_train, X_test)
+        history.append(
+            (
+                accuracy_score(y_test, sklearn_preds),
+                accuracy_score(y_test, scratch_preds),
+            )
+        )
 
     # Format data and plot history.
     history = np.round(history, 4)
@@ -125,7 +144,7 @@ def test_decisiontree(dataset):
     data.insert(0, "Run", [i + 1 if i < 10 else "<b>Mean</b>" for i in range(11)])
     plot_history(data, "cart", dataset_name)
 
-    # Visualise the scratch implementation.
+    # Create additional results.
     additional_visualisations(X, y, dataset_name)
 
 

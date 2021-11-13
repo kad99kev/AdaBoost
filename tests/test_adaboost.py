@@ -17,7 +17,9 @@ from .plot_tests import (
 )
 
 
-def train_sklearn_SAMME(X_train, y_train, X_test, y_test, sample_weights=None):
+def train_sklearn_SAMME(
+    X_train, y_train, X_test, sample_weights=None, return_clf=False
+):
     """
     Written by:
     Name: Kevlyn Kadamala
@@ -30,16 +32,19 @@ def train_sklearn_SAMME(X_train, y_train, X_test, y_test, sample_weights=None):
         X_train: Training inputs split.
         y_train: Training targets split.
         X_test: Testing inputs split.
-        y_test: Testing targets split.
         sample_weights: Sample weights to be used.
     """
     ada = SklearnAdaBoost(n_estimators=50, algorithm="SAMME")
     ada.fit(X_train, y_train, sample_weights)
     preds = ada.predict(X_test)
-    return accuracy_score(y_test, preds)
+    if return_clf:
+        return preds, ada
+    return preds
 
 
-def train_sklearn_SAMMER_R(X_train, y_train, X_test, y_test, sample_weights=None):
+def train_sklearn_SAMMER_R(
+    X_train, y_train, X_test, sample_weights=None, return_clf=False
+):
     """
     Written by:
     Name: Elita Menezes
@@ -52,16 +57,17 @@ def train_sklearn_SAMMER_R(X_train, y_train, X_test, y_test, sample_weights=None
         X_train: Training inputs split.
         y_train: Training targets split.
         X_test: Testing inputs split.
-        y_test: Testing targets split.
         sample_weights: Sample weights to be used.
     """
     ada = SklearnAdaBoost(n_estimators=50, algorithm="SAMME.R")
     ada.fit(X_train, y_train, sample_weights)
     preds = ada.predict(X_test)
-    return accuracy_score(y_test, preds)
+    if return_clf:
+        return preds, ada
+    return preds
 
 
-def train_scratch(X_train, y_train, X_test, y_test, sample_weights=None):
+def train_scratch(X_train, y_train, X_test, sample_weights=None, return_clf=False):
     """
     Written by:
     Name: Kevlyn Kadamala
@@ -74,13 +80,34 @@ def train_scratch(X_train, y_train, X_test, y_test, sample_weights=None):
         X_train: Training inputs split.
         y_train: Training targets split.
         X_test: Testing inputs split.
-        y_test: Testing targets split.
         sample_weights: Sample weights to be used.
     """
     ada = AdaBoostClassifierScratch()
     ada.fit(X_train, y_train, sample_weights)
     preds = ada.predict(X_test)
-    return accuracy_score(y_test, preds)
+    if return_clf:
+        return preds, ada
+    return preds
+
+
+def run_plots(y_test, preds, classes, n_estimators, errors, alphas, file_name):
+    """
+    Plots errors, weights, confusion matrix and the ROC curve.
+
+    Arguments:
+        y_test: Testing targets split.
+        preds: Predictions from classifier.
+        classes: The classes identified by the classifier.
+        n_estimators: The number of estimators used by AdaBoost.
+        errors: Training errors for each estimator.
+        alphas: Weights for each estimator.
+        file_name: File name for saving the image.
+    """
+    plot_errors(n_estimators, errors, "adaboost", file_name)
+    plot_weights(n_estimators, alphas, "adaboost", file_name)
+    plot_confusion_matrix(y_test, preds, classes, "adaboost", file_name)
+    if len(classes) == 2:
+        plot_roc_curve(y_test, preds, "adaboost", file_name)
 
 
 def additional_visualisations(X, y, dataset_name):
@@ -104,25 +131,35 @@ def additional_visualisations(X, y, dataset_name):
 
     # Plot for Scratch.
     file_name = f"scratch_{dataset_name}"
-    clf = AdaBoostClassifierScratch()
-    clf.fit(X_train, y_train)
-    pred = clf.predict(X_test)
-    plot_errors(clf.n_estimators, clf.errors, "adaboost", file_name)
-    plot_weights(clf.n_estimators, clf.alphas, "adaboost", file_name)
-    plot_confusion_matrix(y_test, pred, clf.classes, "adaboost", file_name)
-    if len(clf.classes) == 2:
-        plot_roc_curve(y_test, pred, "adaboost", file_name)
+
+    scratch_preds, scratch_clf = train_scratch(
+        X_train, y_train, X_test, return_clf=True
+    )
+    run_plots(
+        y_test,
+        scratch_preds,
+        scratch_clf.classes,
+        scratch_clf.n_estimators,
+        scratch_clf.errors,
+        scratch_clf.alphas,
+        file_name,
+    )
 
     # Plot for Sklearn.
     file_name = f"sklearn_{dataset_name}"
-    clf = SklearnAdaBoost(n_estimators=50, algorithm="SAMME")
-    clf.fit(X_train, y_train)
-    pred = clf.predict(X_test)
-    plot_errors(clf.n_estimators, clf.estimator_errors_, "adaboost", file_name)
-    plot_weights(clf.n_estimators, clf.estimator_weights_, "adaboost", file_name)
-    plot_confusion_matrix(y_test, pred, clf.classes_, "adaboost", file_name)
-    if len(clf.classes_) == 2:
-        plot_roc_curve(y_test, pred, "adaboost", file_name)
+
+    sklearn_preds, sklearn_clf = train_sklearn_SAMME(
+        X_train, y_train, X_test, return_clf=True
+    )
+    run_plots(
+        y_test,
+        sklearn_preds,
+        sklearn_clf.classes_,
+        sklearn_clf.n_estimators,
+        sklearn_clf.estimator_errors_,
+        sklearn_clf.estimator_weights_,
+        file_name,
+    )
 
 
 def test_adaboost(dataset):
@@ -157,10 +194,16 @@ def test_adaboost(dataset):
         )
 
         # Train models and add to history.
-        sklearn_acc_samme_R = train_sklearn_SAMMER_R(X_train, y_train, X_test, y_test)
-        sklearn_acc_samme = train_sklearn_SAMME(X_train, y_train, X_test, y_test)
-        scratch_acc = train_scratch(X_train, y_train, X_test, y_test)
-        history.append((sklearn_acc_samme_R, sklearn_acc_samme, scratch_acc))
+        preds_sammer = train_sklearn_SAMMER_R(X_train, y_train, X_test)
+        preds_samme = train_sklearn_SAMME(X_train, y_train, X_test)
+        preds_scratch = train_scratch(X_train, y_train, X_test)
+        history.append(
+            (
+                accuracy_score(y_test, preds_sammer),
+                accuracy_score(y_test, preds_samme),
+                accuracy_score(y_test, preds_scratch),
+            )
+        )
 
     # Format data and plot history.
     history = np.round(history, 4)
@@ -178,7 +221,7 @@ def test_adaboost(dataset):
     data.insert(0, "Run", [i + 1 if i < 10 else "<b>Mean</b>" for i in range(11)])
     plot_history(data, "adaboost", dataset_name)
 
-    # Visualise the scratch implementation.
+    # Create additional results.
     additional_visualisations(X, y, dataset_name)
 
 

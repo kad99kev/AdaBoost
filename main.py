@@ -58,6 +58,7 @@ if __name__ == "__main__":
     scratch_pred = clf_scratch.predict(X_test)
     print(f"Accuracy from Scratch Implementation: {round(accuracy_score(y_test, scratch_pred), 4)}")
 
+    print('\n')
     # training and testing AdaBoost from Sklearn
     print("AdaBoost from Sklearn")
     clf_sklearn = SklearnAdaBoost(n_estimators=50, learning_rate=0.05)
@@ -65,4 +66,6 @@ if __name__ == "__main__":
     sklearn_pred = clf_sklearn.predict(X_test)
     print(f"Accuracy from Scratch Implementation: {round(accuracy_score(y_test, sklearn_pred), 4)}")
 
+    print('\n')
     save_output(filename = 'wildfire.csv', y_true = y_test, scratch = scratch_pred, sklearn = sklearn_pred)
+    print("File saved to outputs folder")

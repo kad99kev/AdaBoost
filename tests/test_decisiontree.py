@@ -1,3 +1,10 @@
+"""
+Written by:
+Name: Kevlyn Kadamala
+Student ID: 21236191
+Class: MSc AI
+"""
+
 import argparse
 import pandas as pd
 import numpy as np

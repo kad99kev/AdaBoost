@@ -9,6 +9,11 @@ from sklearn.metrics import roc_curve, auc, confusion_matrix
 
 def plot_history(data, classifier, name):
     """
+    Written by:
+    Name: Kevlyn Kadamala
+    Student ID: 21236191
+    Class: MSc AI
+
     Plots the histories of the test runs.
 
     Arguments:
@@ -22,6 +27,11 @@ def plot_history(data, classifier, name):
 
 def plot_roc_curve(y_test, pred, classifier, name):
     """
+    Written by:
+    Name: Elita Menezes
+    Student ID: 21237434
+    Class: MSc DA
+
     Plots the roc curves for the test and pred.
     Reference: https://plotly.com/python/roc-and-pr-curves/
     Only suitable for binary class labels
@@ -56,6 +66,11 @@ def plot_roc_curve(y_test, pred, classifier, name):
 
 def plot_confusion_matrix(y_test, pred, classes, classifier, name):
     """
+    Written by:
+    Name: Elita Menezes
+    Student ID: 21237434
+    Class: MSc DA
+
     Plots the confusion matrix for the true and predicted values.
     Reference: https://stackoverflow.com/questions/60860121/plotly-how-to-make-an-annotated-confusion-matrix-using-a-heatmap
 
@@ -118,6 +133,11 @@ def plot_confusion_matrix(y_test, pred, classes, classifier, name):
 
 def plot_errors(n_estimators, estimator_errors, classifier, name):
     """
+    Written by:
+    Name: Elita Menezes
+    Student ID: 21237434
+    Class: MSc DA
+
     Plotting the error rate for each estimator.
 
     Arguments:
@@ -140,6 +160,11 @@ def plot_errors(n_estimators, estimator_errors, classifier, name):
 
 def plot_weights(n_estimators, estimator_weights, classifier, name):
     """
+    Written by:
+    Name: Kevlyn Kadamala
+    Student ID: 21236191
+    Class: MSc AI
+
     Plotting the weights for each estimator.
 
     Arguments:

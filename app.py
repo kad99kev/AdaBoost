@@ -32,7 +32,6 @@ def read_files(file):
     return X, y
 
 
-
 def split_data(X, y):
     """
     Splits the dataset into train and test.
@@ -58,22 +57,21 @@ if __name__ == "__main__":
         X, y = read_files(uploaded_file)
         # Splits the data into test and train
 
-    st.markdown("### Or use an existing dataset") 
-    button1, button2, button3 = st.columns(3)  
-    with button1: 
-        if st.button('Wildfires Dataset'):
-            df = pd.read_csv('./data/wildfires.txt', sep="\t", header=0)
+    st.markdown("### Or use an existing dataset")
+    button1, button2, button3 = st.columns(3)
+    with button1:
+        if st.button("Wildfires Dataset"):
+            df = pd.read_csv("./data/wildfires.txt", sep="\t", header=0)
             X = df.iloc[:, 1:]
             y = df.iloc[:, 0]
             y = y.apply(lambda x: x.strip())
     with button2:
-        if st.button('Iris Dataset'):
+        if st.button("Iris Dataset"):
             X, y = load_iris(return_X_y=True, as_frame=True)
     with button3:
-        if st.button('Wine Dataset'):
+        if st.button("Wine Dataset"):
             X, y = load_wine(return_X_y=True, as_frame=True)
 
-    
     try:
         classes = y.unique()
         X_train, X_test, y_train, y_test = split_data(X, y)
@@ -83,9 +81,7 @@ if __name__ == "__main__":
         clf_scratch = AdaBoostClassifierScratch(n_estimators=50, learning_rate=0.05)
         clf_scratch.fit(X_train, y_train)
         pred = clf_scratch.predict(X_test)
-        st.markdown(
-            f"##### Accuracy: {round(accuracy_score(y_test, pred), 4)}"
-        )
+        st.markdown(f"##### Accuracy: {round(accuracy_score(y_test, pred), 4)}")
         if len(classes) == 2:
             dc_col11, dc_col12 = st.columns(2)
 
@@ -104,15 +100,13 @@ if __name__ == "__main__":
 
             # Predicts using the sklearn model
         st.subheader("Adaboost from sklearn (SAMME Algorithm)")
-        clf_sklearn = classifier(
-            n_estimators=50, learning_rate=0.05, algorithm="SAMME"
-        )
+        clf_sklearn = classifier(n_estimators=50, learning_rate=0.05, algorithm="SAMME")
         clf_sklearn.fit(X_train, y_train)
         sklearn_preds = clf_sklearn.predict(X_test)
         st.markdown(
             f"##### Accuracy: {round(accuracy_score(y_test, sklearn_preds), 4)}"
         )
-        
+
         if len(classes) == 2:
             dc_col21, dc_col22 = st.columns(2)
 
@@ -139,8 +133,7 @@ if __name__ == "__main__":
         st.markdown(
             f"##### Accuracy: {round(accuracy_score(y_test, sklearn_preds), 4)}"
         )
-        
-        
+
         if len(classes) == 2:
             dc_col21, dc_col22 = st.columns(2)
 
@@ -157,4 +150,4 @@ if __name__ == "__main__":
             fig = plt_confusion_matrix(y_test, sklearn_preds, classes)
             st.plotly_chart(fig)
     except Exception as e:
-        print("Exception")
+        print(e)

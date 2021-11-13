@@ -19,6 +19,11 @@ from .plot_tests import (
 
 def train_sklearn_SAMME(X_train, y_train, X_test, y_test, sample_weights=None):
     """
+    Written by:
+    Name: Kevlyn Kadamala
+    Student ID: 21236191
+    Class: MSc AI
+
     Training the sklearn model using SAMME algorithm.
 
     Arguments:
@@ -36,6 +41,11 @@ def train_sklearn_SAMME(X_train, y_train, X_test, y_test, sample_weights=None):
 
 def train_sklearn_SAMMER_R(X_train, y_train, X_test, y_test, sample_weights=None):
     """
+    Written by:
+    Name: Elita Menezes
+    Student ID: 21237434
+    Class: MSc DA
+
     Training the sklearn model using SAMME.R algorithm.
 
     Arguments:
@@ -53,6 +63,11 @@ def train_sklearn_SAMMER_R(X_train, y_train, X_test, y_test, sample_weights=None
 
 def train_scratch(X_train, y_train, X_test, y_test, sample_weights=None):
     """
+    Written by:
+    Name: Kevlyn Kadamala
+    Student ID: 21236191
+    Class: MSc AI
+
     Training Adaboost from scratch.
 
     Arguments:
@@ -70,6 +85,11 @@ def train_scratch(X_train, y_train, X_test, y_test, sample_weights=None):
 
 def additional_visualisations(X, y, dataset_name):
     """
+    Written by:
+    Name: Kevlyn Kadamala
+    Student ID: 21236191
+    Class: MSc AI
+
     Plot confusion matrices and ROC Curves for comparison.
 
     Arguments:
@@ -107,6 +127,11 @@ def additional_visualisations(X, y, dataset_name):
 
 def test_adaboost(dataset):
     """
+    Written by:
+    Name: Kevlyn Kadamala
+    Student ID: 21236191
+    Class: MSc AI
+
     Test the Adaboost algorithm on the sklearn and scratch implementation.
 
     Arguments:

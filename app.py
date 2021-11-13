@@ -41,7 +41,7 @@ def split_data(X, y):
         y: Tagret values.
     """
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, random_state=30, test_size=int(len(X) / 3)
+        X, y, random_state=100, test_size=int(len(X) / 3)
     )
     return X_train, X_test, y_train, y_test
 
